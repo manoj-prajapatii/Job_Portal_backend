@@ -32,6 +32,6 @@ const userSchema = new mongoose.Schema({
         company : { type : mongoose.Schema.Types.ObjectId, ref : 'Company'},
 
     }, 
-},{timestamp : 'true'}) 
+},{timestamp : 'true'});
 
 export const User = mongoose.modal (User , userSchema);
