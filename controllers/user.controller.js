@@ -37,21 +37,26 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const { fullname, password, role } = res.body
-        if (!fullname || !password || !role) {
+        const { email, password, role } = req.body
+        if (!email || !password || !role) {
             return res.status(400).json({
                 message: "Incorrect email or password",
                 success: false
             });
         };
-        const user = await User.findOne({ email });
+        let user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({
                 message: "Incorrect email or password",
                 success: false
             });
         };
-
+        if (!user.password) {
+            return res.status(400).json({
+                message: "Password not found. Please register again.",
+                success: false
+            });
+        }
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
             return res.status(400).json({
@@ -69,7 +74,7 @@ export const login = async (req, res) => {
         const tokenData = {
             userId: user._id
         }
-        const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         user = {
             _id: user._id,
@@ -79,15 +84,26 @@ export const login = async (req, res) => {
             role: user.role,
             profile: user.profile,
         }
-        return res.status(200) = cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' }).json({
-            message: `Welcom back ${user.fullname}`,
+        return res.status(200).cookie("token", token, {
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: 'strict'
+        }).json({
+            message: `Welcome back ${user.fullname}`,
             user,
             success: true
-        })
-    } catch (error) {
-
+        });
     }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Server Error",
+            success: false
+        });
+    }
+
 }
+
 
 export const logOut = async (req, res) => {
     try {
@@ -112,21 +128,21 @@ export const updateProfile = async (req, res) => {
         const skillArray = skills.split(",");
         const userId = req.id;
         let user = await user.findOne(userId);
-        if(!user){
+        if (!user) {
             return res.status(400).json({
                 message: "User not found",
-                success :false
+                success: false
             })
         }
 
         user.fullname = fullname,
-        user.email = email,
-        user.phoneNumber = phoneNumber,
-        user.profile.bio = bio,
-        user.profile.skills = skills,
+            user.email = email,
+            user.phoneNumber = phoneNumber,
+            user.profile.bio = bio,
+            user.profile.skills = skills,
 
-        await user.save();
-                user = {
+            await user.save();
+        user = {
             _id: user._id,
             fullname: user.fullname,
             email: user.email,
@@ -140,7 +156,11 @@ export const updateProfile = async (req, res) => {
             success: true
         })
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
+        return re.status(500).json({
+            message: "Server Error",
+            success: false
+        })
     }
 }
