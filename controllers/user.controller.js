@@ -125,9 +125,12 @@ export const updateProfile = async (req, res) => {
                 success: false
             });
         };
-        const skillArray = skills.split(",");
+        let skillArray;
+        if (skills) {
+            skillArray = skills.split(",");
+        }
         const userId = req.id;
-        let user = await user.findOne(userId);
+        let user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({
                 message: "User not found",
@@ -135,13 +138,13 @@ export const updateProfile = async (req, res) => {
             })
         }
 
-        user.fullname = fullname,
-            user.email = email,
-            user.phoneNumber = phoneNumber,
-            user.profile.bio = bio,
-            user.profile.skills = skills,
+        if (fullname) user.fullname = fullname
+        if (email) user.email = email
+        if (phoneNumber) user.phoneNumber = phoneNumber
+        if (bio) user.profile.bio = bio
+        if (skills) user.profile.skills = skills
 
-            await user.save();
+        await user.save();
         user = {
             _id: user._id,
             fullname: user.fullname,
@@ -158,7 +161,7 @@ export const updateProfile = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return re.status(500).json({
+        return res.status(500).json({
             message: "Server Error",
             success: false
         })
