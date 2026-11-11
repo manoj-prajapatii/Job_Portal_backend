@@ -34,4 +34,4 @@ const userSchema = new mongoose.Schema({
     }, 
 },{timestamp : 'true'});
 
-export const User = mongoose.modal (User , userSchema);
+export const User = mongoose.model ("User", userSchema);
