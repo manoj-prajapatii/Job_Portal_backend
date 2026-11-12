@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDb from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
+import companyRoute from "./routes/company.route.js"
 
 dotenv.config({});
 
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 const corsOption = {
-    origin: 'https://localhost:5173',
+    origin: 'http://localhost:5173',
     credentials:true
 }
 app.use (cors(corsOption));
@@ -22,7 +23,8 @@ app.use (cors(corsOption));
 const PORT = process.env.PORT || 8000
 
 app.use("/api/user",userRoute);
+app.use("/api/company",companyRoute);
 app.listen(PORT, () =>{
     connectDb();
-    console.log("Chill broh...! ");
+    console.log("Chill broh....! sb chal rha he!");
 })
