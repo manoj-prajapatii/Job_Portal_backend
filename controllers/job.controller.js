@@ -58,7 +58,7 @@ export const getAllJobs = async (req, res) => {
 
 export const getJobById = async (req, res) => {
     try {
-        const jodId = req.params.id;
+        const jobId = req.params.id;
         const job = await Job.findById(jobId);
         if (!job) {
             return res.status(404).json({
@@ -81,7 +81,7 @@ export const getAdminJobs = async (req, res) => {
     try {
         const adminId = req.id;
         const jobs = await Job.find({ createdBy: adminId })
-        if (!job) {
+        if (!jobs) {
             return res.status(404).json({
                 message: "job not found.",
                 success: false
